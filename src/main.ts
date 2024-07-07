@@ -1,10 +1,16 @@
-import { AccountServiceProduction } from './application';
-import API from './driver';
-import { AccountDAODatabase } from './resource';
+import GetAccount from './GetAccount';
+import Signup from './Signup';
+import AccountController from './AccountController';
+import { AccountRepositoryDatabase } from './AccountRepository';
+import PgPromisseAdapter from './DatabaseConnection';
+import { ExpressAdapter } from './HttpServer';
 
-const accountDAO = new AccountDAODatabase();
-const accountService = new AccountServiceProduction(accountDAO);
-const api = new API(accountService);
+const httpServer = new ExpressAdapter();
+const databaseConnection = new PgPromisseAdapter();
+const accountRepository = new AccountRepositoryDatabase(databaseConnection);
+const signup = new Signup(accountRepository);
+const getAccount = new GetAccount(accountRepository);
 
-api.build();
-api.start();
+new AccountController(httpServer, signup, getAccount);
+
+httpServer.listen(3000);
