@@ -30,6 +30,7 @@ test('Should create an account for the passenger', async function () {
     name: 'John Doe',
     email: `john.doe${Math.random()}@email.com`,
     cpf: '97456321558',
+    password: '123456',
     isPassenger: true,
     isDriver: false,
   };
@@ -48,6 +49,7 @@ test('Should create an account for the driver', async function () {
     name: 'John Doe',
     email: `john.doe${Math.random()}@email.com`,
     cpf: '97456321558',
+    password: '123456',
     isPassenger: false,
     isDriver: true,
     carPlate: 'ABC1234',
@@ -68,6 +70,7 @@ test('Should not create a passenger account with invalid name', async function (
     name: '',
     email: `john.doe${Math.random()}@email.com`,
     cpf: '97456321558',
+    password: '123456',
     isPassenger: true,
     isDriver: false,
   };
@@ -80,6 +83,7 @@ test('Should not create a passenger account with invalid e-mail', async function
     name: 'John Doe',
     email: `john.doe`,
     cpf: '97456321558',
+    password: '123456',
     isPassenger: true,
     isDriver: false,
   };
@@ -92,6 +96,7 @@ test('Should not create a passenger account with invalid CPF', async function ()
     name: 'John Doe',
     email: `john.doe${Math.random()}@email.com`,
     cpf: '9745632155',
+    password: '123456',
     isPassenger: true,
     isDriver: false,
   };
@@ -104,6 +109,7 @@ test('Should not create a passenger account with duplicated e-mail', async funct
     name: 'John Doe',
     email: `john.doe${Math.random()}@email.com`,
     cpf: '97456321558',
+    password: '123456',
     isPassenger: true,
     isDriver: false,
   };
@@ -119,6 +125,7 @@ test('Should not create a driver account with invalid car plate', async function
     name: 'John Doe',
     email: `john.doe${Math.random()}@email.com`,
     cpf: '97456321558',
+    password: '123456',
     isPassenger: false,
     isDriver: true,
     carPlate: 'ABC123',
@@ -133,6 +140,7 @@ test('Should create a passenger account with MailerGateway stub', async function
     name: 'John Doe',
     email: `john.doe${Math.random()}@gmail.com`,
     cpf: '97456321558',
+    password: '123456',
     isPassenger: true,
     isDriver: false,
   };
@@ -153,10 +161,19 @@ test('Should create a passenger account with AccountRepository stub', async func
     name: 'John Doe',
     email,
     cpf: '97456321558',
+    password: '123456',
     isPassenger: true,
     isDriver: false,
   };
-  const inputSignupStup = Account.create('John Doe', email, '97456321558', true, false);
+  const inputSignupStup = Account.create(
+    'John Doe',
+    email,
+    '97456321558',
+    '123456',
+    'plain',
+    true,
+    false,
+  );
 
   const stubSaveAccount = sinon
     .stub(AccountRepositoryDatabase.prototype, 'save')
@@ -190,6 +207,7 @@ test('Should create a passenger account with fake AccountRepository', async func
     name: 'John Doe',
     email: `john.doe${Math.random()}@gmail.com`,
     cpf: '97456321558',
+    password: '123456',
     isPassenger: true,
     isDriver: false,
   };
@@ -211,6 +229,7 @@ test('Should create a passenger account with MailerGateway spy', async function 
     name: 'John Doe',
     email: `john.doe${Math.random()}@gmail.com`,
     cpf: '97456321558',
+    password: '123456',
     isPassenger: true,
     isDriver: false,
   };
@@ -232,6 +251,7 @@ test('Should create a passenger account with MailerGateway mock', async function
     name: 'John Doe',
     email: `john.doe${Math.random()}@gmail.com`,
     cpf: '97456321558',
+    password: '123456',
     isPassenger: true,
     isDriver: false,
   };

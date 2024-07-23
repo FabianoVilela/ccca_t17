@@ -11,6 +11,7 @@ test('Should create an account for the passenger by API', async function () {
     name: 'John Doe',
     email: `john.doe${Math.random()}@email.com`,
     cpf: '97456321558',
+    password: '123456',
     isPassenger: true,
     isDriver: false,
   };
@@ -35,6 +36,7 @@ test('Should not create a passenger account with invalid CPF by API', async func
     name: 'John Doe',
     email: `john.doe${Math.random()}@email.com`,
     cpf: '974563215580',
+    password: '123456',
     isPassenger: true,
     isDriver: false,
   };

@@ -18,6 +18,8 @@ export class AccountRepositoryDatabase implements AccountRepository {
       accountData.name,
       accountData.email,
       accountData.cpf,
+      accountData.password,
+      accountData.password_type,
       accountData.is_passenger,
       accountData.is_driver,
       accountData.car_plate,
@@ -34,31 +36,39 @@ export class AccountRepositoryDatabase implements AccountRepository {
 
     if (!accountData) throw new Error('Account not found!');
 
+    // console.log('accountData =>', accountData);
+
     const account = new Account(
       accountData.account_id,
       accountData.name,
       accountData.email,
       accountData.cpf,
+      accountData.password,
+      accountData.password_type,
       accountData.is_passenger,
       accountData.is_driver,
       accountData.car_plate,
     );
+
+    // console.log('account =>', account);
 
     return account;
   }
 
   async save(account: any) {
     const insetQuery =
-      'insert into cccat17.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver) values ($1, $2, $3, $4, $5, $6, $7)';
+      'insert into cccat17.account (account_id, name, email, cpf, password, password_type, is_passenger, is_driver, car_plate) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)';
 
     await this.connection.query(insetQuery, [
       account.accountId,
       account.getName(),
       account.getEmail(),
       account.getCpf(),
-      account.getCarPlate(),
+      account.getPassword(),
+      account.passwordType,
       !!account.isPassenger,
       !!account.isDriver,
+      account.getCarPlate(),
     ]);
   }
 
@@ -73,9 +83,11 @@ export class AccountRepositoryDatabase implements AccountRepository {
           accountData.name,
           accountData.email,
           accountData.cpf,
-          accountData.car_plate,
+          accountData.password,
+          accountData.password_type,
           accountData.is_passenger,
           accountData.is_driver,
+          accountData.car_plate,
         ),
       );
     }

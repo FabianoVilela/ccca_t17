@@ -7,9 +7,11 @@ create table cccat17.account (
 	name text not null,
 	email text not null,
 	cpf text not null,
-	car_plate text null,
+	password text not null,
+	password_type text not null,
 	is_passenger boolean not null default false,
 	is_driver boolean not null default false
+	car_plate text null,
 );
 
 create table cccat17.ride (
@@ -23,5 +25,13 @@ create table cccat17.ride (
 	from_long numeric,
 	to_lat numeric,
 	to_long numeric,
+	date timestamp
+);
+
+create table cccat17.position (
+	position_id uuid,
+	ride_id uuid,
+	lat numeric,
+	long numeric,
 	date timestamp
 );

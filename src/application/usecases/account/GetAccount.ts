@@ -8,6 +8,7 @@ type Output = {
   name: string;
   email: string;
   cpf: string;
+  password: string;
   isPassenger: boolean;
   isDriver: boolean;
   carPlate?: string;
@@ -30,6 +31,7 @@ export default class GetAccount implements UseCase {
       name: account.getName(),
       email: account.getEmail(),
       cpf: account.getCpf(),
+      password: account.getPassword(),
       isPassenger: account.isPassenger,
       isDriver: account.isDriver,
       carPlate: account.getCarPlate(),

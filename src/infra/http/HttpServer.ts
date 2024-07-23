@@ -1,13 +1,13 @@
-import express from 'express';
 import Hapi, { RouteDefMethods } from '@hapi/hapi';
-import Fastify, { FastifyInstance, HTTPMethods } from 'fastify'
+import express from 'express';
+import Fastify, { FastifyInstance, HTTPMethods } from 'fastify';
 
 export default interface HttpServer {
-  regitster(method: string, url: string, callback: Function): void;
+  register(method: string, url: string, callback: Function): void;
   listen(port: number): void;
 }
 
-export class ExpressAdapter implements HttpServer{
+export class ExpressAdapter implements HttpServer {
   server: any;
 
   constructor() {
@@ -15,8 +15,8 @@ export class ExpressAdapter implements HttpServer{
     this.server.use(express.json());
   }
 
-  regitster(method: string, url: string, callback: Function) {
-    this.server[method](url.replace(/\{|\}/g, ""), async (req: any, res: any) => {
+  register(method: string, url: string, callback: Function) {
+    this.server[method](url.replace(/\{|\}/g, ''), async (req: any, res: any) => {
       try {
         const output = await callback(req.params, req.body);
         res.json(output);
@@ -40,23 +40,23 @@ export class HapiAdapter implements HttpServer {
     this.server = Hapi.server({});
   }
 
-  regitster(method: RouteDefMethods, url: string, callback: Function): void {
+  register(method: RouteDefMethods, url: string, callback: Function): void {
     this.server.route({
-			method,
-			path: url.replace(/\:/g, ""),
-			handler: async (request: any, res: any) => {
-				try {
-					const output = await callback(request.params, request.payload);
-					return output;
-				} catch (e: any) {
-					return res.response({ message: e.message }).code(422);
-				}
-			}
-		})
+      method,
+      path: url.replace(/\:/g, ''),
+      handler: async (request: any, res: any) => {
+        try {
+          const output = await callback(request.params, request.payload);
+          return output;
+        } catch (e: any) {
+          return res.response({ message: e.message }).code(422);
+        }
+      },
+    });
   }
   listen(port: number): void {
     this.server.settings.port = port;
-		this.server.start();
+    this.server.start();
   }
 }
 
@@ -67,10 +67,10 @@ export class FastifyAdapter implements HttpServer {
     this.server = Fastify({});
   }
 
-  regitster(method: HTTPMethods, url: string, callback: Function): void {
+  register(method: HTTPMethods, url: string, callback: Function): void {
     this.server.route({
       method: method,
-      url: url.replace(/\{|\}/g, ""),
+      url: url.replace(/\{|\}/g, ''),
       handler: async (req: any, res: any) => {
         try {
           const output = await callback(req.params, req.body);
@@ -80,11 +80,11 @@ export class FastifyAdapter implements HttpServer {
           this.server.log.error(error);
           return error;
         }
-    }
-  });
-}
+      },
+    });
+  }
 
   listen(port: number): void {
-    this.server.listen({port: port});
+    this.server.listen({ port: port });
   }
 }

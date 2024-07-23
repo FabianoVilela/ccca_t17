@@ -41,9 +41,11 @@ export default class SuperRideRepositoryDatabase implements SuperRideRepository 
       accountData.name,
       accountData.email,
       accountData.cpf,
-      accountData.car_plate,
+      accountData.password,
+      accountData.password_type,
       accountData.is_passenger,
       accountData.is_driver,
+      accountData.car_plate,
     );
 
     return new SuperRide(

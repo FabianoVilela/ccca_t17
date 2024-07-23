@@ -1,5 +1,6 @@
 import MailerGateway from '../../src/application/gateways/MailerGateway';
 import Signup from '../../src/application/usecases/account/Signup';
+import AcceptRide from '../../src/application/usecases/ride/AcceptRide';
 import GetRide from '../../src/application/usecases/ride/GetRide';
 import RequestRide from '../../src/application/usecases/ride/RequestRide';
 import DatabaseConnection, {
@@ -15,8 +16,9 @@ let signup: Signup;
 let mailerGateway: MailerGateway;
 let requestRide: RequestRide;
 let getRide: GetRide;
+let acceptRide: AcceptRide;
 
-beforeAll(() => {
+beforeEach(() => {
   connection = new PgPromiseAdapter();
   const accountRepository = new AccountRepositoryDatabase(connection);
 
@@ -24,16 +26,15 @@ beforeAll(() => {
   signup = new Signup(accountRepository, mailerGateway);
 
   const rideRepository = new RideRepositoryDatabase(connection);
-  requestRide = new RequestRide(rideRepository, accountRepository);
-
   const positionRepository = new PositionRepositoryDatabase(connection);
-  requestRide = new RequestRide(rideRepository, accountRepository);
 
+  requestRide = new RequestRide(rideRepository, accountRepository);
   getRide = new GetRide(rideRepository, accountRepository, positionRepository);
+  acceptRide = new AcceptRide(rideRepository, accountRepository);
 });
 
-test('Should request a ride', async function () {
-  const inputSignup = {
+test('Should accept a ride', async function () {
+  const inputSignupPassenger = {
     name: 'John Doe',
     email: `john.doe${Math.random()}@gmail.com`,
     cpf: '97456321558',
@@ -42,9 +43,9 @@ test('Should request a ride', async function () {
     isDriver: false,
   };
 
-  const outputSignup = await signup.execute(inputSignup);
+  const outputSignupPassenger = await signup.execute(inputSignupPassenger);
   const inputRequestRide = {
-    passengerId: outputSignup.accountId,
+    passengerId: outputSignupPassenger.accountId,
     fromLat: -27.584905257808835,
     fromLong: -48.545022195325124,
     toLat: -27.496887588317275,
@@ -52,20 +53,7 @@ test('Should request a ride', async function () {
   };
 
   const outputRequestRide = await requestRide.execute(inputRequestRide);
-  expect(outputRequestRide.rideId).toBeDefined();
-
-  const outputGetRide = await getRide.execute(outputRequestRide.rideId);
-  expect(outputGetRide.rideId).toBe(outputRequestRide.rideId);
-  expect(outputGetRide.passengerId).toBe(inputRequestRide.passengerId);
-  expect(outputGetRide.fromLat).toBe(inputRequestRide.fromLat);
-  expect(outputGetRide.fromLong).toBe(inputRequestRide.fromLong);
-  expect(outputGetRide.toLat).toBe(inputRequestRide.toLat);
-  expect(outputGetRide.toLong).toBe(inputRequestRide.toLong);
-  expect(outputGetRide.status).toBe('requested');
-});
-
-test('Should not be able to request a ride if the account is not a passenger', async function () {
-  const inputSignup = {
+  const inputSignupDriver = {
     name: 'John Doe',
     email: `john.doe${Math.random()}@gmail.com`,
     cpf: '97456321558',
@@ -74,23 +62,23 @@ test('Should not be able to request a ride if the account is not a passenger', a
     isDriver: true,
     carPlate: 'ABC1234',
   };
-  const outputSignup = await signup.execute(inputSignup);
 
-  const inputRequestRide = {
-    passengerId: outputSignup.accountId,
-    fromLat: -27.584905257808835,
-    fromLong: -48.545022195325124,
-    toLat: -27.496887588317275,
-    toLong: -48.522234807851476,
+  const outputSignupDriver = await signup.execute(inputSignupDriver);
+
+  const inputAcceptRide = {
+    rideId: outputRequestRide.rideId,
+    driverId: outputSignupDriver.accountId,
   };
 
-  await expect(() => requestRide.execute(inputRequestRide)).rejects.toThrow(
-    new Error('This account is not from passenger'),
-  );
+  await acceptRide.execute(inputAcceptRide);
+  const outputGetRide = await getRide.execute(outputRequestRide.rideId);
+
+  expect(outputGetRide.status).toBe('accepted'); // ACCEPTED
+  expect(outputGetRide.driverId).toBe(outputSignupDriver.accountId);
 });
 
-test('Should not be able to request a ride if the passenger already has another unfinished ride', async function () {
-  const inputSignup = {
+test('Should not accept a ride if the driver is ongoing ride', async function () {
+  const inputSignupPassenger = {
     name: 'John Doe',
     email: `john.doe${Math.random()}@gmail.com`,
     cpf: '97456321558',
@@ -98,21 +86,36 @@ test('Should not be able to request a ride if the passenger already has another 
     isPassenger: true,
     isDriver: false,
   };
-  const outputSignup = await signup.execute(inputSignup);
+  const outputSignupPassenger = await signup.execute(inputSignupPassenger);
   const inputRequestRide = {
-    passengerId: outputSignup.accountId,
+    passengerId: outputSignupPassenger.accountId,
     fromLat: -27.584905257808835,
     fromLong: -48.545022195325124,
     toLat: -27.496887588317275,
     toLong: -48.522234807851476,
   };
+  const outputRequestRide = await requestRide.execute(inputRequestRide);
+  const inputSignupDriver = {
+    name: 'John Doe',
+    email: `john.doe${Math.random()}@gmail.com`,
+    cpf: '97456321558',
+    password: '123456',
+    isPassenger: false,
+    isDriver: true,
+    carPlate: 'ABC1234',
+  };
+  const outputSignupDriver = await signup.execute(inputSignupDriver);
+  const inputAcceptRide = {
+    rideId: outputRequestRide.rideId,
+    driverId: outputSignupDriver.accountId,
+  };
 
-  await requestRide.execute(inputRequestRide);
-  await expect(() => requestRide.execute(inputRequestRide)).rejects.toThrow(
-    new Error('This passenger has an active ride'),
+  await acceptRide.execute(inputAcceptRide);
+  await expect(() => acceptRide.execute(inputAcceptRide)).rejects.toThrow(
+    new Error('This driver has an active ride'),
   );
 });
 
-afterAll(async () => {
+afterEach(async () => {
   await connection.close();
 });

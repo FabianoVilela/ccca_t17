@@ -8,6 +8,8 @@ type Input = {
   name: string;
   email: string;
   cpf: string;
+  password: string;
+  passwordType?: string;
   isPassenger: boolean;
   isDriver: boolean;
   carPlate?: string;
@@ -21,6 +23,7 @@ export default class Signup implements UseCase {
   accountRepository: AccountRepository;
   mailerGateway: MailerGateway;
 
+  // NOTE: Dependency Injection that enabled the Dependency Inversion (DIP) design principle
   constructor(
     accountRepository: AccountRepository,
     mailerGateway: MailerGateway = new MailerGatewayFake(),
@@ -29,11 +32,18 @@ export default class Signup implements UseCase {
     this.mailerGateway = mailerGateway;
   }
 
+  // NOTE: Dependency Injection
+  setAccountRepository(accountRepository: AccountRepository) {
+    this.accountRepository = accountRepository;
+  }
+
   async execute(input: Input): Promise<Output> {
     const account = Account.create(
       input.name,
       input.email,
       input.cpf,
+      input.password,
+      (input.passwordType = 'plain'),
       input.isPassenger,
       input.isDriver,
       input.carPlate,
