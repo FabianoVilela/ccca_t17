@@ -1,12 +1,12 @@
-version: "3.8"
 services:
   # =================================================
   # POSTGRES SERVER
   # =================================================
-  pg-docker:
+  # Account's database
+  pg-account:
     user: root
     image: postgres:14-alpine
-    container_name: ccca_database
+    container_name: ccca_account_database
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: docker
@@ -14,9 +14,41 @@ services:
     ports:
       - 5433:5432
     volumes:
-      - pg_storage:/var/lib/postgresql/data
+      - pg_account_storage:/var/lib/postgresql/data
     networks:
       - dev-network
+
+  # Ride's database
+  pg-ride:
+    user: root
+    image: postgres:14-alpine
+    container_name: ccca_ride_database
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: app
+    ports:
+      - 5434:5432
+    volumes:
+      - pg_ride_storage:/var/lib/postgresql/data
+    networks:
+      - dev-network
+
+  # =================================================
+  # RABBITMQ SERVER
+  # =================================================
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: ccca_rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbitmq
+      RABBITMQ_DEFAULT_PASS: docker
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - rabbitmq_storage:/var/lib/rabbitmq
+      - rabbitmq_storage:/var/log/rabbitmq
 
 # =================================================
 # NETWORK
@@ -29,4 +61,6 @@ networks:
 # VOLUMES
 # =================================================
 volumes:
-  pg_storage:
+  pg_account_storage:
+  pg_ride_storage:
+  rabbitmq_storage:
