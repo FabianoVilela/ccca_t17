@@ -1,6 +1,10 @@
 import RideRepository from '../../repositories/RideRepository';
 import UseCase from '../UseCase';
 
+type Input = {
+  rideId: string;
+};
+
 export default class StartRide implements UseCase {
   constructor(readonly rideRepository: RideRepository) {}
 
@@ -11,7 +15,3 @@ export default class StartRide implements UseCase {
     await this.rideRepository.updateRide(ride);
   }
 }
-
-type Input = {
-  rideId: string;
-};
