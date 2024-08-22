@@ -4395,6 +4395,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"payment@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "payment@workspace:."
+  dependencies:
+    "@hapi/hapi": "npm:^21.3.10"
+    "@types/amqplib": "npm:^0.10.5"
+    "@types/express": "npm:^4.17.17"
+    "@types/jest": "npm:^29.5.4"
+    "@types/sinon": "npm:^17.0.3"
+    amqplib: "npm:^0.10.4"
+    axios: "npm:^1.5.0"
+    express: "npm:^4.18.2"
+    fastify: "npm:^4.28.1"
+    jest: "npm:^29.6.4"
+    nodemon: "npm:^3.0.1"
+    pg-promise: "npm:^11.5.4"
+    sinon: "npm:^18.0.0"
+    ts-jest: "npm:^29.1.1"
+    ts-node: "npm:^10.9.1"
+    typescript: "npm:^5.2.2"
+  languageName: unknown
+  linkType: soft
+
 "pg-cloudflare@npm:^1.1.1":
   version: 1.1.1
   resolution: "pg-cloudflare@npm:1.1.1"
@@ -4879,29 +4902,6 @@ __metadata:
   checksum: 10c0/4614e4292356cafade0b6031527eea9bc90f2372a22c012313be1dcc69a3b90c7338158b414539be863fa95bfcb2ddcd0587be696841af4e6679d85e62c060c7
   languageName: node
   linkType: hard
-
-"ride@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "ride@workspace:."
-  dependencies:
-    "@hapi/hapi": "npm:^21.3.10"
-    "@types/amqplib": "npm:^0.10.5"
-    "@types/express": "npm:^4.17.17"
-    "@types/jest": "npm:^29.5.4"
-    "@types/sinon": "npm:^17.0.3"
-    amqplib: "npm:^0.10.4"
-    axios: "npm:^1.5.0"
-    express: "npm:^4.18.2"
-    fastify: "npm:^4.28.1"
-    jest: "npm:^29.6.4"
-    nodemon: "npm:^3.0.1"
-    pg-promise: "npm:^11.5.4"
-    sinon: "npm:^18.0.0"
-    ts-jest: "npm:^29.1.1"
-    ts-node: "npm:^10.9.1"
-    typescript: "npm:^5.2.2"
-  languageName: unknown
-  linkType: soft
 
 "safe-buffer@npm:5.2.1, safe-buffer@npm:~5.2.0":
   version: 5.2.1

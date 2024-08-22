@@ -1,11 +1,25 @@
 import crypto from 'crypto';
+import Observer from '../../infra/madiators/Observer';
+import RideCompletedEvent from '../events/RideCompletedEvent';
 import { FareCalculatorFactory } from '../services/FareCalculatorFactory';
 import Coord from '../vos/Coord';
 import Segment from '../vos/Segment';
 import Position from './Position';
 
+// NOTE: Account
+type Input = {
+  accountId?: string;
+  name: string;
+  email: string;
+  cpf: string;
+  password: string;
+  isPassenger: boolean;
+  isDriver: boolean;
+  carPlate?: string;
+};
+
 // NOTE: Entity, as Aggregate led by Ride (root) that contains Coord
-export default class Ride {
+export default class Ride extends Observer {
   private from: Coord;
   private to: Coord;
 
@@ -22,6 +36,7 @@ export default class Ride {
     public distance: number,
     public fare: number,
   ) {
+    super();
     this.from = new Coord(fromLat, fromLong);
     this.to = new Coord(toLat, toLong);
   }
@@ -62,11 +77,11 @@ export default class Ride {
     return this.to;
   }
 
-  accept(account: any) {
+  accept(account: Input) {
     if (!account.isDriver) throw new Error('Account is not from a driver');
     if (this.status !== 'requested') throw new Error('Invalid status!');
 
-    this.driverId = account.accountId;
+    this.driverId = account.accountId!;
     this.status = 'accepted';
   }
 
@@ -88,8 +103,12 @@ export default class Ride {
   }
 
   finish() {
-    if (this.status !== 'in_progress') throw new Error('Invalid status!');
+    if (this.status !== 'in_progress') throw new Error('Invalid status');
 
     this.status = 'completed';
+
+    const event = new RideCompletedEvent(this.rideId, this.fare);
+
+    this.notify('rideCompleted', event);
   }
 }

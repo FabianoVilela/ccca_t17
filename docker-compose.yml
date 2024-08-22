@@ -15,6 +15,7 @@ services:
       - 5433:5432
     volumes:
       - pg_account_storage:/var/lib/postgresql/data
+      - ./backend/account/create.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - dev-network
 
@@ -31,6 +32,7 @@ services:
       - 5434:5432
     volumes:
       - pg_ride_storage:/var/lib/postgresql/data
+      - ./backend/ride/create.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - dev-network
 
@@ -38,11 +40,12 @@ services:
   # RABBITMQ SERVER
   # =================================================
   rabbitmq:
-    image: rabbitmq:3-management-alpine
+    # image: rabbitmq:3-management-alpine
+    image: rabbitmq:3-management
     container_name: ccca_rabbitmq
-    environment:
-      RABBITMQ_DEFAULT_USER: rabbitmq
-      RABBITMQ_DEFAULT_PASS: docker
+    # environment:
+    #   RABBITMQ_DEFAULT_USER: rabbitmq
+    #   RABBITMQ_DEFAULT_PASS: docker
     ports:
       - 5672:5672
       - 15672:15672

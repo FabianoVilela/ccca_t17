@@ -37,6 +37,7 @@ test('Should start a ride', async function () {
     email: `john.doe${Math.random()}@gmail.com`,
     cpf: '97456321558',
     password: '123456',
+    passwordType: 'plain',
     isPassenger: true,
     isDriver: false,
   };
@@ -55,6 +56,7 @@ test('Should start a ride', async function () {
     email: `john.doe${Math.random()}@gmail.com`,
     cpf: '97456321558',
     password: '123456',
+    passwordType: 'plain',
     isPassenger: false,
     isDriver: true,
     carPlate: 'ABC1234',

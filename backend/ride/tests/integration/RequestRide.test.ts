@@ -14,7 +14,7 @@ let requestRide: RequestRide;
 let getRide: GetRide;
 let accountGateway: AccountGateway;
 
-beforeAll(() => {
+beforeEach(() => {
   dbConnection = new PgPromiseAdapter();
   const httpClient = new AxiosAdapter();
   accountGateway = new AccountGatewayHttp(httpClient);
@@ -110,6 +110,6 @@ test('Should not be able to request a ride if the passenger already has another 
   );
 });
 
-afterAll(async () => {
+afterEach(async () => {
   await dbConnection.close();
 });

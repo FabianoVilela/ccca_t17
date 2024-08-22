@@ -14,7 +14,6 @@ test('Should calculate the distance of the race', function () {
     email: 'john.doe@gmail.com',
     cpf: '97456321558',
     password: '123456',
-    passwordType: 'plain',
     isPassenger: false,
     isDriver: true,
     carPlate: 'ABC1234',

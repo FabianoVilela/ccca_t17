@@ -12,6 +12,7 @@ test('You must create a passenger account through the API', async function () {
     email: `john.doe${Math.random()}@gmail.com`,
     cpf: '97456321558',
     password: '123456',
+    passwordType: 'plain',
     isPassenger: true,
     isDriver: false,
   };

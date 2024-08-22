@@ -9,7 +9,10 @@ import DatabaseConnection, {
   PgPromiseAdapter,
 } from '../../src/infra/databases/DatabaseConnection';
 import AccountGatewayHttp from '../../src/infra/gateways/AccountGatewayHttp';
+import PaymentGatewayHttp from '../../src/infra/gateways/PaymentGatewayHttp';
 import { AxiosAdapter } from '../../src/infra/http/HttpClient';
+import Mediator from '../../src/infra/madiators/Mediator';
+import Queue, { RabbitMQAdapter } from '../../src/infra/queues/Queue';
 import PositionRepositoryDatabase from '../../src/infra/repositories/PositionRepositoryDatabase';
 import RideRepositoryDatabase from '../../src/infra/repositories/RideRepositoryDatabase';
 
@@ -21,8 +24,9 @@ let startRide: StartRide;
 let updatePosition: UpdatePosition;
 let accountGateway: AccountGateway;
 let finishRide: FinishRide;
+let queue: Queue;
 
-beforeEach(() => {
+beforeEach(async () => {
   dbConnection = new PgPromiseAdapter();
   const httpClient = new AxiosAdapter();
   const rideRepository = new RideRepositoryDatabase(dbConnection);
@@ -34,7 +38,19 @@ beforeEach(() => {
   acceptRide = new AcceptRide(rideRepository, accountGateway);
   startRide = new StartRide(rideRepository);
   updatePosition = new UpdatePosition(rideRepository, positionRepository);
-  finishRide = new FinishRide(rideRepository);
+  queue = new RabbitMQAdapter();
+
+  const mediator = new Mediator();
+  // NOTE: Using mediator
+  // mediator.register("rideCompleted", async function (data: any) {
+  // 	await processPayment.execute(data);
+  // 	await generateInvoice.execute(data);
+  // });
+
+  const paymentGateway = new PaymentGatewayHttp(httpClient);
+  await queue.connect();
+
+  finishRide = new FinishRide(rideRepository, mediator, paymentGateway, queue);
 });
 
 test('Should finish a ride', async function () {
@@ -43,11 +59,13 @@ test('Should finish a ride', async function () {
     email: `john.doe${Math.random()}@gmail.com`,
     cpf: '97456321558',
     password: '123456',
+    passwordType: 'plain',
     isPassenger: true,
     isDriver: false,
   };
 
   const outputSignupPassenger = await accountGateway.signup(inputSignupPassenger);
+
   const inputRequestRide = {
     passengerId: outputSignupPassenger.accountId,
     fromLat: -27.584905257808835,
@@ -56,11 +74,13 @@ test('Should finish a ride', async function () {
     toLong: -48.522234807851476,
   };
   const outputRequestRide = await requestRide.execute(inputRequestRide);
+
   const inputSignupDriver = {
     name: 'John Doe',
     email: `john.doe${Math.random()}@gmail.com`,
     cpf: '97456321558',
     password: '123456',
+    passwordType: 'plain',
     isPassenger: false,
     isDriver: true,
     carPlate: 'ABC1234',
@@ -108,4 +128,8 @@ test('Should finish a ride', async function () {
 
 afterEach(async () => {
   await dbConnection.close();
+
+  setTimeout(async () => {
+    await queue.disconnect();
+  }, 500);
 });
